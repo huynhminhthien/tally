@@ -1,0 +1,6 @@
+[submodule "libs/TimerOne"]
+	path = libs/TimerOne
+	url = https://github.com/PaulStoffregen/TimerOne.git
+[submodule "libs/Arduino-Log"]
+	path = libs/Arduino-Log
+	url = https://github.com/thijse/Arduino-Log.git
