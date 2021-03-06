@@ -20,7 +20,7 @@ void Tally::Begin() {
   InitSwitchInput();
 retry:
   // To configure the CS pin
-  Ethernet.init(5);
+  Ethernet.init(CS_SPI);
   // start the Ethernet
   Ethernet.begin(_mac, _ip);
 
@@ -147,14 +147,11 @@ void Tally::HandleDataFromAtem() {
       if ((program_tally && !preview_tally) ||
           (program_tally &&
            preview_tally)) {  // only program, or program AND preview
-        // drawLabel(RED, BLACK, LOW);
-        _camera_status[tally_number - 1] = 0x32;
-      } else if (preview_tally && !program_tally) {  // only preview
-        // drawLabel(GREEN, BLACK, HIGH);
-        _camera_status[tally_number - 1] = 0x31;
+        _camera_status[tally_number - 1] = 0x32;      // red
+      } else if (preview_tally && !program_tally) {   // only preview
+        _camera_status[tally_number - 1] = 0x31;      // green
       } else if (!preview_tally || !program_tally) {  // neither
-        // drawLabel(BLACK, GRAY, HIGH);
-        _camera_status[tally_number - 1] = 0x30;
+        _camera_status[tally_number - 1] = 0x30;      // black
       }
     }
 

@@ -1,6 +1,0 @@
-project dependence:
-    https://github.com/kasperskaarhoj/SKAARHOJ-Open-Engineering (ATEMstd, ATEMbase, SkaarhojPgmspace)
-    https://github.com/thijse/Arduino-Log
-    https://github.com/PaulStoffregen/TimerOne
-    
-    

@@ -9,15 +9,17 @@
 #include <SoftwareSerial.h>
 #include <TimerOne.h>
 
-#define MAX_TALLY 8
-
-#define rolandTX 10
-#define rolandRX 11
-
 #define ARRAY_SIZE(variable) (*(&variable + 1) - variable)
 
 // define for pin number of switch
-typedef enum device { ATEM = 1, VMIX = 2, ROLAND = 3 } TALLY_TYPE;
+typedef enum device { ATEM = 3, VMIX = 4, ROLAND = 5 } TALLY_TYPE;
+
+#define MAX_TALLY 8
+#define rolandTX 6
+#define rolandRX 7
+#define CS_SPI 10
+#define DEVICE_DEFAULT ATEM
+
 typedef enum rolandTallyParam {
   PGM,
   PST,
@@ -43,7 +45,7 @@ class Tally {
   IPAddress _atem_server;
   uint8_t _port_vmix = 8099;  // Vmix fixed port 8099
 
-  TALLY_TYPE _tally_type = VMIX;
+  TALLY_TYPE _tally_type = DEVICE_DEFAULT;
 
   uint8_t _camera_status[MAX_TALLY] = {0};
   uint8_t _previous_roland[4] = {0};
