@@ -43,7 +43,7 @@ class Tally {
 
   IPAddress _vmix_server;
   IPAddress _atem_server;
-  uint8_t _port_vmix = 8099;  // Vmix fixed port 8099
+  uint16_t _port_vmix = 8099;  // Vmix fixed port 8099
 
   TALLY_TYPE _tally_type = DEVICE_DEFAULT;
 

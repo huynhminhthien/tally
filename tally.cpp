@@ -242,7 +242,8 @@ void Tally::InitVmix() {
 void Tally::InitAtem() {
   // Initialize a connection to the switcher
   _atem_switcher.begin(_atem_server);
-  _atem_switcher.serialOutput(0x80);
+  // set to 0x80 to enable debug
+  _atem_switcher.serialOutput(0);
   _atem_switcher.connect();
 }
 
