@@ -45,8 +45,15 @@ retry:
 uint8_t* Tally::ProcessTally() {
   bool is_change = false;
   switch (_tally_type) {
-    case VMIX:
-      while (_client.available()) {
+    case VMIX: {
+      uint8_t timeout = 0;
+      const uint8_t max_timeout = 10;  // 1s
+      while (!_client.available() && timeout < max_timeout) {
+        delay(100);
+        timeout++;
+      }
+      if (timeout == max_timeout) return nullptr;
+      if (_client.available()) {
         String data = _client.readStringUntil('\r\n');
         is_change = HandleDataFromVmix(data);
         if (is_change) {
@@ -55,20 +62,18 @@ uint8_t* Tally::ProcessTally() {
           }
         }
       }
-      // if (_client.available()) {
-      //   char c = client.read();
-      //   Serial.print(c);
-      // }
-      break;
-    case ATEM:
-      // Check for packets, respond to them etc. Keeping the connection alive!
-      // VERY important that this function is called all the time - otherwise
-      // connection might be lost because packets from the switcher is
-      // overlooked and not responded to.
+    } break;
+    case ATEM: {
+      /*
+      Check for packets, respond to them etc. Keeping the connection alive!
+      VERY important that this function is called all the time - otherwise
+      connection might be lost because packets from the switcher is
+      overlooked and not responded to.
+      */
       _atem_switcher.runLoop();
       HandleDataFromAtem();
-      break;
-    case ROLAND:
+    } break;
+    case ROLAND: {
       String input_string = "";
       while (_roland.available()) {
         // get the new byte
@@ -81,7 +86,7 @@ uint8_t* Tally::ProcessTally() {
           is_change = true;
         }
       }
-      break;
+    } break;
     default:
       Log.error("device not support (%d)" CR, _tally_type);
       break;
@@ -283,9 +288,13 @@ void Tally::HandleSwitchDevice() {
 }
 
 void Tally::ConnectToVmix() {
-  while (!_client.connect(_vmix_server, _port_vmix)) {
-    delay(1000);
-    Log.notice("." CR);
+  uint8_t timeout = 0;
+  const uint8_t max_timeout = 5;  // 1s
+  while (!_client.connect(_vmix_server, _port_vmix) &&
+         timeout < max_timeout) {
+    delay(200);
+    timeout++;
   }
+  if (timeout == max_timeout) return;
   Log.notice("connected Vmix" CR);
 }
