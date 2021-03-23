@@ -12,15 +12,15 @@
 #define ARRAY_SIZE(variable) (*(&variable + 1) - variable)
 
 // define for pin number of switch
-typedef enum device { ATEM = 3, VMIX = 4, ROLAND = 5 } TALLY_TYPE;
+typedef enum Device { ATEM = 3, VMIX = 4, ROLAND = 5 } TALLY_TYPE;
 
 #define MAX_TALLY 8
-#define rolandTX 6
-#define rolandRX 7
+#define ROLAND_TX 6
+#define ROLAND_RX 7
 #define CS_SPI 10
 #define DEVICE_DEFAULT ATEM
 
-typedef enum rolandTallyParam {
+typedef enum RolandTallyParam {
   PGM,
   PST,
   PinP,

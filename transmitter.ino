@@ -38,6 +38,7 @@ void loop() {
                       ? strlen(camera_status)
                       : 4;
     memcpy(send_data + 1, camera_status, len);
+    send_data[len + 1] = 0x3B;
 
     for (uint8_t i = 0; i < ARRAY_SIZE(send_data); i++) {
       Log.notice("%d" CR, send_data[i]);

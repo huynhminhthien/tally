@@ -1,7 +1,7 @@
 #include "tally.h"
 
 Tally* Tally::m_instance = nullptr;
-SoftwareSerial Tally::_roland = SoftwareSerial(rolandRX, rolandTX);
+SoftwareSerial Tally::_roland = SoftwareSerial(ROLAND_RX, ROLAND_TX);
 
 Tally* Tally::Instance() {
   if (!m_instance) {
@@ -39,7 +39,7 @@ retry:
   }
 
   IPAddress ip = Ethernet.localIP();
-  Log.notice("My IP address: %s.%s.%s.%s" CR, ip[0], ip[1], ip[2], ip[3]);
+  Log.notice("My IP address: %d.%d.%d.%d" CR, ip[0], ip[1], ip[2], ip[3]);
 }
 
 uint8_t* Tally::ProcessTally() {
@@ -198,7 +198,7 @@ void Tally::HandleDataFromRoland(String response) {
       pch = strtok(nullptr, ",;");
     }
     // set all status tally to off
-    memset(_camera_status, '0', MAX_TALLY);
+    memset(_camera_status, '0', 4);
     // assign PGM LED and PST LED
     _camera_status[infor_tally[PGM]] = 0x32;  // red
     _camera_status[infor_tally[PST]] = 0x31;  // green
@@ -212,7 +212,7 @@ void Tally::HandleDataFromRoland(String response) {
  */
 void Tally::DumpStatusCamera() {
   Log.notice("status camera" CR);
-  for (uint8_t i = 0; i < MAX_TALLY; i++) {
+  for (uint8_t i = 0; i < 4; i++) {
     Log.notice("%d" CR, _camera_status[i]);
   }
 }
