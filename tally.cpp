@@ -17,7 +17,6 @@ Tally::Tally()
       _atem_server(192, 168, 0, 100) {}
 
 void Tally::Begin() {
-  InitSwitchInput();
 retry:
   // To configure the CS pin
   Ethernet.init(CS_SPI);
@@ -265,22 +264,14 @@ void Tally::InitRoland() {
   Timer1.start();
 }
 
-void Tally::InitSwitchInput() {
-  pinMode(ATEM, INPUT);
-  pinMode(VMIX, INPUT);
-  pinMode(ROLAND, INPUT);
-}
-
-void Tally::HandleSwitchDevice() {
-  uint8_t device[] = {ATEM, VMIX, ROLAND};
-  for (uint8_t i = 0; i < ARRAY_SIZE(device); i++) {
-    if (!digitalRead(device[i])) {
-      if (_tally_type != device[i]) {
-        _tally_type = device[i];
-        InitConnectionWithServerSide();
-      }
-      break;
-    }
+void Tally::SetTallyDevice(TALLY_TYPE type) {
+  if (type == _tally_type) return;
+  if (type > TALLY_MIN && type < TALLY_MAX) {
+    _tally_type = type;
+    InitConnectionWithServerSide();
+  } else {
+    Log.error("tally type is not support");
+    return;
   }
   if (_tally_type != ROLAND) {
     Timer1.stop();

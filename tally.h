@@ -12,7 +12,13 @@
 #define ARRAY_SIZE(variable) (*(&variable + 1) - variable)
 
 // define for pin number of switch
-typedef enum Device { ATEM = 3, VMIX = 4, ROLAND = 5 } TALLY_TYPE;
+typedef enum Device {
+  TALLY_MIN = 0,
+  ATEM,
+  VMIX,
+  ROLAND,
+  TALLY_MAX
+} TALLY_TYPE;
 
 #define MAX_TALLY 8
 #define ROLAND_TX 6
@@ -60,7 +66,6 @@ class Tally {
   void InitVmix();
   void InitAtem();
   void InitRoland();
-  void InitSwitchInput();
   void DumpStatusCamera();
   static void TimerIsr();
 
@@ -74,7 +79,7 @@ class Tally {
   void InitConnectionWithServerSide();
   uint8_t* ProcessTally();
   void CheckConnection();
-  void HandleSwitchDevice();
+  void SetTallyDevice(TALLY_TYPE type);
   TALLY_TYPE WhichDevice() { return _tally_type; }
 };
 
