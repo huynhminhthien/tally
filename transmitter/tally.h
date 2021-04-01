@@ -1,11 +1,8 @@
 #ifndef TALLY_h
 #define TALLY_h
 
-#include <ATEMbase.h>
-#include <ATEMstd.h>
+#include <ATEM.h>
 #include <ArduinoLog.h>
-#include <Ethernet.h>
-#include <SPI.h>
 #include <SoftwareSerial.h>
 #include <TimerOne.h>
 
@@ -44,7 +41,7 @@ class Tally {
   byte _mac[6];
   IPAddress _ip;
 
-  ATEMstd _atem_switcher;
+  ATEM _atem_switcher;
   EthernetClient _client;
 
   IPAddress _vmix_server;

@@ -26,19 +26,19 @@ retry:
   // Check for Ethernet hardware present
   if (Ethernet.hardwareStatus() == EthernetNoHardware) {
     Log.error(
-        "Ethernet shield was not found. "
-        "Sorry, can't run without hardware. :(" CR);
+        F("Ethernet shield was not found. "
+          "Sorry, can't run without hardware. :(" CR));
     while (true) {
       delay(1);  // do nothing, no point running without Ethernet hardware
     }
   }
   if (Ethernet.linkStatus() == LinkOFF) {
-    Log.error("Ethernet cable is not connected." CR);
+    Log.error(F("Ethernet cable is not connected." CR));
     goto retry;
   }
 
   IPAddress ip = Ethernet.localIP();
-  Log.notice("My IP address: %d.%d.%d.%d" CR, ip[0], ip[1], ip[2], ip[3]);
+  Log.notice(F("My IP address: %d.%d.%d.%d" CR), ip[0], ip[1], ip[2], ip[3]);
 }
 
 uint8_t* Tally::ProcessTally() {
@@ -87,7 +87,7 @@ uint8_t* Tally::ProcessTally() {
       }
     } break;
     default:
-      Log.error("device not support (%d)" CR, _tally_type);
+      Log.error(F("device not support (%d)" CR), _tally_type);
       break;
   }
   return (is_change) ? _camera_status : nullptr;
@@ -97,22 +97,22 @@ void Tally::CheckConnection() {
   switch (_tally_type) {
     case E_VMIX:
       if (!_client.connected()) {
-        Log.notice("disconnected Vmix" CR);
+        Log.notice(F("disconnected Vmix" CR));
         ConnectToVmix();
       }
       break;
     case E_ATEM:
       // If connection is gone anyway, try to reconnect:
-      // if (_atem_switcher.isConnectionTimedOut()) {
-      //   Log.warning(
-      //       "Connection to ATEM Switcher has timed out - reconnecting!");
-      //   _atem_switcher.connect();
-      // }
+      if (_atem_switcher.isConnectionTimedOut()) {
+        Log.warning(
+            F("Connection to ATEM Switcher has timed out - reconnecting!"));
+        _atem_switcher.connect();
+      }
       break;
     case E_ROLAND:
       break;
     default:
-      Log.error("device not support (%d)" CR, _tally_type);
+      Log.error(F("device not support (%d)" CR), _tally_type);
       break;
   }
 }
@@ -135,7 +135,7 @@ bool Tally::HandleDataFromVmix(String data) {
       }
     }
   }
-  Log.notice("Response from vMix: %s" CR, data.c_str());
+  Log.notice(F("Response from vMix: %s" CR), data.c_str());
 
   return is_change;
 }
@@ -215,7 +215,7 @@ void Tally::HandleDataFromRoland(String response) {
  *
  */
 void Tally::DumpStatusCamera() {
-  Log.notice("status camera" CR);
+  Log.notice(F("status camera" CR));
   for (uint8_t i = 0; i < 4; i++) {
     Log.notice("%d" CR, _camera_status[i]);
   }
@@ -233,14 +233,14 @@ void Tally::InitConnectionWithServerSide() {
       InitRoland();
       break;
     default:
-      Log.error("device not support (%d)" CR, _tally_type);
+      Log.error(F("device not support (%d)" CR), _tally_type);
       break;
   }
 }
 
 void Tally::InitVmix() {
   ConnectToVmix();
-  _client.println("SUBSCRIBE TALLY");
+  _client.println(F("SUBSCRIBE TALLY"));
 }
 
 void Tally::InitAtem() {
@@ -270,7 +270,7 @@ void Tally::SetTallyDevice(TALLY_TYPE type) {
     _tally_type = type;
     InitConnectionWithServerSide();
   } else {
-    Log.error("tally type is not support");
+    Log.error(F("tally type is not support" CR));
     return;
   }
   if (_tally_type != E_ROLAND) {
@@ -287,5 +287,5 @@ void Tally::ConnectToVmix() {
     timeout++;
   }
   if (timeout == max_timeout) return;
-  Log.notice("connected Vmix" CR);
+  Log.notice(F("connected Vmix" CR));
 }

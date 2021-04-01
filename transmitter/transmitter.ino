@@ -1,5 +1,4 @@
 #include <ArduinoLog.h>
-#include <SoftwareSerial.h>
 
 // Uncomment line below to fully disable logging
 // #define DISABLE_LOGGING
@@ -25,7 +24,7 @@ void setup() {
   Log.begin(LOG_LEVEL_VERBOSE, &Serial);
 
   RF.begin(9600);
-  Log.notice("Start" CR);
+  Log.notice(F("Start" CR));
   ButtonInit();
 
   // init start/stop value
@@ -73,7 +72,7 @@ void ButtonHandle() {
           if (mode >= E_MODE_MAX) {
             mode = 0;
           }
-          Log.trace("MODE button --> %s" CR, mode == 0 ? "CONFIG" : "TALLY");
+          Log.trace(F("MODE button --> %s" CR), mode == 0 ? "CONFIG" : "TALLY");
           break;
         case E_UP:
           if (mode == E_TALLY_SWITCH) {
@@ -81,7 +80,7 @@ void ButtonHandle() {
             if (tally_device >= E_TALLY_MAX) {
               tally_device = E_TALLY_MIN + 1;
             }
-            Log.trace("UP button - Tally mode --> %d" CR, tally_device);
+            Log.trace(F("UP button - Tally mode --> %d" CR), tally_device);
           } else if (mode == E_CONFIG) {
           }
           break;
@@ -91,16 +90,16 @@ void ButtonHandle() {
             if (tally_device == E_TALLY_MIN) {
               tally_device = E_TALLY_MAX - 1;
             }
-            Log.trace("DOWN button - Tally mode --> %d" CR, tally_device);
+            Log.trace(F("DOWN button - Tally mode --> %d" CR), tally_device);
           } else if (mode == E_CONFIG) {
           }
           break;
         case E_SET:
-          Log.trace("SET button" CR);
+          Log.trace(F("SET button" CR));
           Tally::Instance()->SetTallyDevice(tally_device);
           break;
         default:
-          Log.warning("button %d is not support" CR, button[i]);
+          Log.warning(F("button %d is not support" CR), button[i]);
           break;
       }
       return;
