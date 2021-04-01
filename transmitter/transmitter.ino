@@ -6,15 +6,15 @@
 
 #include "tally.h"
 
-typedef enum Button { UP = 3, DOWN = 4, SET = 5, MODE = 6 } BUTTON_TYPE;
-typedef enum Mode { CONFIG = 0, TALLY_SWITCH, MODE_MAX } MODE_TYPE;
+typedef enum Button { E_UP = 3, E_DOWN = 4, E_SET = 5, E_MODE = 6 } BUTTON_TYPE;
+typedef enum Mode { E_CONFIG = 0, E_TALLY_SWITCH, E_MODE_MAX } MODE_TYPE;
 
 SoftwareSerial RF(8, 9);  // RX, TX
 
 uint8_t send_data[MAX_TALLY + 2] = {0x30};
 uint8_t *camera_status = nullptr;
-const uint8_t button[] = {UP, DOWN, SET, MODE};
-uint8_t mode = TALLY_SWITCH;
+const uint8_t button[] = {E_UP, E_DOWN, E_SET, E_MODE};
+uint8_t mode = E_TALLY_SWITCH;
 uint8_t tally_device = DEVICE_DEFAULT;
 
 void setup() {
@@ -40,7 +40,7 @@ void setup() {
 void loop() {
   camera_status = Tally::Instance()->ProcessTally();
   if (camera_status) {
-    uint8_t len = (Tally::Instance()->WhichDevice() != ROLAND &&
+    uint8_t len = (Tally::Instance()->WhichDevice() != E_ROLAND &&
                    strlen(camera_status) <= MAX_TALLY)
                       ? strlen(camera_status)
                       : 4;
@@ -68,34 +68,34 @@ void ButtonHandle() {
   for (uint8_t i = 0; i < ARRAY_SIZE(button); i++) {
     if (!digitalRead(button[i])) {
       switch (button[i]) {
-        case MODE:
+        case E_MODE:
           mode++;
-          if (mode >= MODE_MAX) {
+          if (mode >= E_MODE_MAX) {
             mode = 0;
           }
           Log.trace("MODE button --> %s" CR, mode == 0 ? "CONFIG" : "TALLY");
           break;
-        case UP:
-          if (mode == TALLY_SWITCH) {
+        case E_UP:
+          if (mode == E_TALLY_SWITCH) {
             tally_device++;
-            if (tally_device >= TALLY_MAX) {
-              tally_device = TALLY_MIN + 1;
+            if (tally_device >= E_TALLY_MAX) {
+              tally_device = E_TALLY_MIN + 1;
             }
             Log.trace("UP button - Tally mode --> %d" CR, tally_device);
-          } else if (mode == CONFIG) {
+          } else if (mode == E_CONFIG) {
           }
           break;
-        case DOWN:
-          if (mode == TALLY_SWITCH) {
+        case E_DOWN:
+          if (mode == E_TALLY_SWITCH) {
             tally_device--;
-            if (tally_device == TALLY_MIN) {
-              tally_device = TALLY_MAX - 1;
+            if (tally_device == E_TALLY_MIN) {
+              tally_device = E_TALLY_MAX - 1;
             }
             Log.trace("DOWN button - Tally mode --> %d" CR, tally_device);
-          } else if (mode == CONFIG) {
+          } else if (mode == E_CONFIG) {
           }
           break;
-        case SET:
+        case E_SET:
           Log.trace("SET button" CR);
           Tally::Instance()->SetTallyDevice(tally_device);
           break;

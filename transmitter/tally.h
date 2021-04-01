@@ -13,18 +13,18 @@
 
 // define for pin number of switch
 typedef enum Device {
-  TALLY_MIN = 0,
-  ATEM,
-  VMIX,
-  ROLAND,
-  TALLY_MAX
+  E_TALLY_MIN = 0,
+  E_ATEM,
+  E_VMIX,
+  E_ROLAND,
+  E_TALLY_MAX
 } TALLY_TYPE;
 
 #define MAX_TALLY 8
 #define ROLAND_TX 6
 #define ROLAND_RX 7
 #define CS_SPI 10
-#define DEVICE_DEFAULT ATEM
+#define DEVICE_DEFAULT E_ATEM
 
 typedef enum RolandTallyParam {
   PGM,

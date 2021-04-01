@@ -44,7 +44,7 @@ retry:
 uint8_t* Tally::ProcessTally() {
   bool is_change = false;
   switch (_tally_type) {
-    case VMIX: {
+    case E_VMIX: {
       uint8_t timeout = 0;
       const uint8_t max_timeout = 10;  // 1s
       while (!_client.available() && timeout < max_timeout) {
@@ -62,7 +62,7 @@ uint8_t* Tally::ProcessTally() {
         }
       }
     } break;
-    case ATEM: {
+    case E_ATEM: {
       /*
       Check for packets, respond to them etc. Keeping the connection alive!
       VERY important that this function is called all the time - otherwise
@@ -72,7 +72,7 @@ uint8_t* Tally::ProcessTally() {
       _atem_switcher.runLoop();
       HandleDataFromAtem();
     } break;
-    case ROLAND: {
+    case E_ROLAND: {
       String input_string = "";
       while (_roland.available()) {
         // get the new byte
@@ -95,21 +95,21 @@ uint8_t* Tally::ProcessTally() {
 
 void Tally::CheckConnection() {
   switch (_tally_type) {
-    case VMIX:
+    case E_VMIX:
       if (!_client.connected()) {
         Log.notice("disconnected Vmix" CR);
         ConnectToVmix();
       }
       break;
-    case ATEM:
-      // // If connection is gone anyway, try to reconnect:
+    case E_ATEM:
+      // If connection is gone anyway, try to reconnect:
       // if (_atem_switcher.isConnectionTimedOut()) {
       //   Log.warning(
       //       "Connection to ATEM Switcher has timed out - reconnecting!");
       //   _atem_switcher.connect();
       // }
       break;
-    case ROLAND:
+    case E_ROLAND:
       break;
     default:
       Log.error("device not support (%d)" CR, _tally_type);
@@ -223,13 +223,13 @@ void Tally::DumpStatusCamera() {
 
 void Tally::InitConnectionWithServerSide() {
   switch (_tally_type) {
-    case VMIX:
+    case E_VMIX:
       InitVmix();
       break;
-    case ATEM:
+    case E_ATEM:
       InitAtem();
       break;
-    case ROLAND:
+    case E_ROLAND:
       InitRoland();
       break;
     default:
@@ -266,14 +266,14 @@ void Tally::InitRoland() {
 
 void Tally::SetTallyDevice(TALLY_TYPE type) {
   if (type == _tally_type) return;
-  if (type > TALLY_MIN && type < TALLY_MAX) {
+  if (type > E_TALLY_MIN && type < E_TALLY_MAX) {
     _tally_type = type;
     InitConnectionWithServerSide();
   } else {
     Log.error("tally type is not support");
     return;
   }
-  if (_tally_type != ROLAND) {
+  if (_tally_type != E_ROLAND) {
     Timer1.stop();
   }
 }
