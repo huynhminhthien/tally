@@ -1,7 +1,7 @@
 #include "tally.h"
 
 Tally* Tally::m_instance = nullptr;
-SoftwareSerial Tally::_roland = SoftwareSerial(ROLAND_RX, ROLAND_TX);
+HardwareSerial Tally::_roland = HardwareSerial(2);
 
 Tally* Tally::Instance() {
   if (!m_instance) {
@@ -194,7 +194,7 @@ void Tally::HandleDataFromRoland(String response) {
     uint8_t infor_tally[MAXPARAM] = {0};
     uint8_t i = 0;
     // split each number via ',;' character delimiter
-    pch = strtok(content_rsp + len, ",;");
+    pch = strtok((char *)content_rsp + len, ",;");
     while (pch != nullptr && i < MAXPARAM) {
       infor_tally[i] = atoi(pch);
       Log.notice("%d" CR, infor_tally[i]);
@@ -203,6 +203,7 @@ void Tally::HandleDataFromRoland(String response) {
     }
     // set all status tally to off
     memset(_camera_status, '0', 4);
+    _camera_status[4] = '\0';
     // assign PGM LED and PST LED
     _camera_status[infor_tally[PGM]] = 0x32;  // red
     _camera_status[infor_tally[PST]] = 0x31;  // green
@@ -251,7 +252,7 @@ void Tally::InitAtem() {
   _atem_switcher.connect();
 }
 
-static void Tally::TimerIsr() {
+void Tally::RolandRequest() {
   // request to ROLAND->stxQPL : 8;
   const char roland_request[] = {0x02, 0x51, 0x50, 0x4C, 0x3A, 0x38, 0x3B};
   _roland.println(roland_request);
@@ -259,9 +260,7 @@ static void Tally::TimerIsr() {
 
 void Tally::InitRoland() {
   _roland.begin(9600);
-  Timer1.initialize(300000);
-  Timer1.attachInterrupt(TimerIsr);
-  Timer1.start();
+  _timer.attach(kRolandPeriod, RolandRequest);
 }
 
 void Tally::SetTallyDevice(TALLY_TYPE type) {
@@ -274,7 +273,7 @@ void Tally::SetTallyDevice(TALLY_TYPE type) {
     return;
   }
   if (_tally_type != E_ROLAND) {
-    Timer1.stop();
+    _timer.detach();
   }
 }
 

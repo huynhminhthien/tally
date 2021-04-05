@@ -3,8 +3,8 @@
 
 #include <ATEM.h>
 #include <ArduinoLog.h>
-#include <SoftwareSerial.h>
-#include <TimerOne.h>
+#include <HardwareSerial.h>
+#include <Ticker.h>
 
 #define ARRAY_SIZE(variable) (*(&variable + 1) - variable)
 
@@ -55,6 +55,8 @@ class Tally {
   bool _preview_tally_previous[MAX_TALLY] = {true};
   bool _program_tally_previous[MAX_TALLY] = {true};
 
+  const float kRolandPeriod = 0.5;  //seconds
+
   Tally();
   bool HandleDataFromVmix(String data);
   void HandleDataFromAtem();
@@ -64,10 +66,11 @@ class Tally {
   void InitAtem();
   void InitRoland();
   void DumpStatusCamera();
-  static void TimerIsr();
+  static void RolandRequest();
 
   static Tally* m_instance;
-  static SoftwareSerial _roland;
+  static HardwareSerial _roland;
+  Ticker _timer;
 
  public:
   static Tally* Instance();

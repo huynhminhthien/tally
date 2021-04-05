@@ -1,4 +1,5 @@
 #include <ArduinoLog.h>
+// #include "HardwareSerial.h"
 
 // Uncomment line below to fully disable logging
 // #define DISABLE_LOGGING
@@ -8,7 +9,7 @@
 typedef enum Button { E_UP = 3, E_DOWN = 4, E_SET = 5, E_MODE = 6 } BUTTON_TYPE;
 typedef enum Mode { E_CONFIG = 0, E_TALLY_SWITCH, E_MODE_MAX } MODE_TYPE;
 
-SoftwareSerial RF(8, 9);  // RX, TX
+// SoftwareSerial RF(8, 9);  // RX, TX
 
 uint8_t send_data[MAX_TALLY + 2] = {0x30};
 uint8_t *camera_status = nullptr;
@@ -23,7 +24,7 @@ void setup() {
   }
   Log.begin(LOG_LEVEL_VERBOSE, &Serial);
 
-  RF.begin(9600);
+  // RF.begin(9600);
   Log.notice(F("Start" CR));
   ButtonInit();
 
@@ -39,17 +40,14 @@ void setup() {
 void loop() {
   camera_status = Tally::Instance()->ProcessTally();
   if (camera_status) {
-    uint8_t len = (Tally::Instance()->WhichDevice() != E_ROLAND &&
-                   strlen(camera_status) <= MAX_TALLY)
-                      ? strlen(camera_status)
-                      : 4;
+    uint8_t len = strlen((const char*)camera_status);
     memcpy(send_data + 1, camera_status, len);
     send_data[len + 1] = 0x3B;
 
     for (uint8_t i = 0; i < ARRAY_SIZE(send_data); i++) {
       Log.notice("%d" CR, send_data[i]);
     }
-    RF.println((const char)send_data);
+    // RF.println((const char)send_data);
   }
   Tally::Instance()->CheckConnection();
 }
@@ -96,7 +94,7 @@ void ButtonHandle() {
           break;
         case E_SET:
           Log.trace(F("SET button" CR));
-          Tally::Instance()->SetTallyDevice(tally_device);
+          Tally::Instance()->SetTallyDevice((TALLY_TYPE)tally_device);
           break;
         default:
           Log.warning(F("button %d is not support" CR), button[i]);
