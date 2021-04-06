@@ -1,7 +1,8 @@
 {
-    "board": "arduino:avr:nano",
-    "configuration": "cpu=atmega328old",
-    "sketch": "transmitter.ino",
+    "board": "esp32:esp32:esp32doit-devkit-v1",
+    "configuration": "FlashFreq=80,UploadSpeed=921600,DebugLevel=none",
+    "sketch": "transmitter\\transmitter.ino",
     "output": "./arduinoOutput",
-    "port": "COM3"
+    "port": "COM3",
+    "programmer": "Arduino as ISP"
 }

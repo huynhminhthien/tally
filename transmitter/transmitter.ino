@@ -1,4 +1,4 @@
-#include <ArduinoLog.h>
+// #include <ArduinoLog.h>
 // #include "HardwareSerial.h"
 
 // Uncomment line below to fully disable logging
@@ -6,16 +6,29 @@
 
 #include "tally.h"
 
-typedef enum Button { E_UP = 3, E_DOWN = 4, E_SET = 5, E_MODE = 6 } BUTTON_TYPE;
-typedef enum Mode { E_CONFIG = 0, E_TALLY_SWITCH, E_MODE_MAX } MODE_TYPE;
+#define ARRAY_SIZE(variable) (*(&variable + 1) - variable)
+
+typedef enum Button {
+  kUp = 3,
+  kDown = 4,
+  kSet = 5,
+  kMode = 12
+} BUTTON_TYPE;
+typedef enum Mode {
+  kConfig = 0,
+  kTallySwitch,
+  kModeMax
+} MODE_TYPE;
 
 // SoftwareSerial RF(8, 9);  // RX, TX
 
-uint8_t send_data[MAX_TALLY + 2] = {0x30};
-uint8_t *camera_status = nullptr;
-const uint8_t button[] = {E_UP, E_DOWN, E_SET, E_MODE};
-uint8_t mode = E_TALLY_SWITCH;
-uint8_t tally_device = DEVICE_DEFAULT;
+char send_data[MAX_TALLY + 2] = {0x30};
+char* camera_status = nullptr;
+const uint8_t button[] = {kUp, kDown, kSet, kMode};
+uint8_t mode = kTallySwitch;
+uint8_t tally_device = Tally::kVmix;
+
+Device* my_device = nullptr;
 
 void setup() {
   Serial.begin(115200);
@@ -26,19 +39,17 @@ void setup() {
 
   // RF.begin(9600);
   Log.notice(F("Start" CR));
-  ButtonInit();
+  // ButtonInit();
 
   // init start/stop value
   send_data[0] = 0x31;
   send_data[MAX_TALLY + 1] = 0x3B;
 
-  // start tally
-  Tally::Instance()->Begin();
-  Tally::Instance()->InitConnectionWithServerSide();
+  my_device = Tally::Instance()->GetDevice((Tally::TYPE_DEVICE)tally_device);
 }
 
 void loop() {
-  camera_status = Tally::Instance()->ProcessTally();
+  camera_status = my_device->HandleData();
   if (camera_status) {
     uint8_t len = strlen((const char*)camera_status);
     memcpy(send_data + 1, camera_status, len);
@@ -49,7 +60,7 @@ void loop() {
     }
     // RF.println((const char)send_data);
   }
-  Tally::Instance()->CheckConnection();
+  my_device->CheckConnection();
 }
 
 void ButtonInit() {
@@ -65,36 +76,38 @@ void ButtonHandle() {
   for (uint8_t i = 0; i < ARRAY_SIZE(button); i++) {
     if (!digitalRead(button[i])) {
       switch (button[i]) {
-        case E_MODE:
+        case kMode:
           mode++;
-          if (mode >= E_MODE_MAX) {
+          if (mode >= kModeMax) {
             mode = 0;
           }
-          Log.trace(F("MODE button --> %s" CR), mode == 0 ? "CONFIG" : "TALLY");
+          Log.trace(F("MODE button --> %s" CR),
+                    mode == 0 ? "CONFIG" : "TALLY");
           break;
-        case E_UP:
-          if (mode == E_TALLY_SWITCH) {
+        case kUp:
+          if (mode == kTallySwitch) {
             tally_device++;
-            if (tally_device >= E_TALLY_MAX) {
-              tally_device = E_TALLY_MIN + 1;
+            if (tally_device >= Tally::kDeviceMax) {
+              tally_device = Tally::kDeviceMin + 1;
             }
             Log.trace(F("UP button - Tally mode --> %d" CR), tally_device);
-          } else if (mode == E_CONFIG) {
+          } else if (mode == kConfig) {
           }
           break;
-        case E_DOWN:
-          if (mode == E_TALLY_SWITCH) {
+        case kDown:
+          if (mode == kTallySwitch) {
             tally_device--;
-            if (tally_device == E_TALLY_MIN) {
-              tally_device = E_TALLY_MAX - 1;
+            if (tally_device == Tally::kDeviceMin) {
+              tally_device = Tally::kDeviceMax - 1;
             }
             Log.trace(F("DOWN button - Tally mode --> %d" CR), tally_device);
-          } else if (mode == E_CONFIG) {
+          } else if (mode == kConfig) {
           }
           break;
-        case E_SET:
+        case kSet:
           Log.trace(F("SET button" CR));
-          Tally::Instance()->SetTallyDevice((TALLY_TYPE)tally_device);
+          my_device =
+              Tally::Instance()->GetDevice((Tally::TYPE_DEVICE)tally_device);
           break;
         default:
           Log.warning(F("button %d is not support" CR), button[i]);
