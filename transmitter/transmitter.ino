@@ -1,5 +1,4 @@
-// #include <ArduinoLog.h>
-// #include "HardwareSerial.h"
+#include <SoftwareSerial.h>
 
 // Uncomment line below to fully disable logging
 // #define DISABLE_LOGGING
@@ -20,7 +19,7 @@ typedef enum Mode {
   kModeMax
 } MODE_TYPE;
 
-// SoftwareSerial RF(8, 9);  // RX, TX
+SoftwareSerial RF(8, 9);  // RX, TX
 
 char send_data[MAX_TALLY + 2] = {0x30};
 char* camera_status = nullptr;
@@ -58,7 +57,7 @@ void loop() {
     for (uint8_t i = 0; i < ARRAY_SIZE(send_data); i++) {
       Log.notice("%d" CR, send_data[i]);
     }
-    // RF.println((const char)send_data);
+    RF.println(send_data);
   }
   my_device->CheckConnection();
 }
