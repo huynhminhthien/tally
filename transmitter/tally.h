@@ -1,5 +1,5 @@
 /*
-  
+
   Pinout/connections:
   W5500  | ESP32
   --------------------

@@ -1,8 +1,8 @@
 {
     "board": "esp32:esp32:esp32doit-devkit-v1",
     "configuration": "FlashFreq=80,UploadSpeed=921600,DebugLevel=none",
-    "sketch": "transmitter\\transmitter.ino",
     "output": "./arduinoOutput",
     "port": "COM3",
-    "programmer": "Arduino as ISP"
+    "programmer": "Arduino as ISP",
+    "sketch": "receiver\\receiver.ino"
 }
